@@ -187,18 +187,35 @@ public void show() throws ServletException, IOException {
 
     public void destroy() throws ServletException, IOException {
 
-        //CSRF対策 tokenのチェック
+
         if (checkToken()) {
 
-            //idを条件に従業員データを論理削除する
+
             service.destroy(toNumber(getRequestParam(AttributeConst.EMP_ID)));
 
-            //セッションに削除完了のフラッシュメッセージを設定
+
             putSessionScope(AttributeConst.FLUSH, MessageConst.I_DELETED.getMessage());
 
-            //一覧画面にリダイレクト
+
             redirect(ForwardConst.ACT_EMP, ForwardConst.CMD_INDEX);
         }
     }
 
+    private boolean checkAdmin() throws ServletException, IOException {
+
+
+        EmployeeView ev = (EmployeeView) getSessionScope(AttributeConst.LOGIN_EMP);
+
+
+        if (ev.getAdminFlag() != AttributeConst.ROLE_ADMIN.getIntegerValue()) {
+
+            forward(ForwardConst.FW_ERR_UNKNOWN);
+            return false;
+
+        } else {
+
+            return true;
+        }
+
+    }
 }
